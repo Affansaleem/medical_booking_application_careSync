@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_shadows.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/routes/app_routes.dart';
+import '../../../../core/utils/app_toast.dart';
+import '../../../auth/presentation/providers/auth_state_provider.dart';
+import '../../../../core/widgets/app_confirmation_dialog.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   final String title;
 
   const HomePage({super.key, required this.title});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends ConsumerState<HomePage> {
   int _counter = 0;
 
   void _incrementCounter() {
@@ -25,6 +31,14 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+
+    ref.listen<AuthState>(authNotifierProvider, (previous, next) {
+      if (next is AuthUnauthenticated) {
+        context.go(AppRoutes.login);
+      } else if (next is AuthError) {
+        AppToast.showError(context, next.message);
+      }
+    });
 
     return Scaffold(
       backgroundColor: isDark
@@ -50,8 +64,21 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {},
           ),
           IconButton(
-            icon: const Icon(Icons.account_circle_outlined),
-            onPressed: () {},
+            icon: const Icon(Icons.logout_rounded),
+            tooltip: 'Log Out',
+            onPressed: () async {
+              final confirmed = await AppConfirmationDialog.show(
+                context,
+                title: 'Log Out',
+                content: 'Are you sure you want to log out from CareSync?',
+                confirmText: 'Log Out',
+                isDangerous: true,
+                icon: Icons.logout_rounded,
+              );
+              if (confirmed && context.mounted) {
+                ref.read(authNotifierProvider.notifier).signOut();
+              }
+            },
           ),
           const SizedBox(width: 8),
         ],
