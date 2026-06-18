@@ -9,6 +9,9 @@ import '../../domain/usecases/sign_in_usecase.dart';
 import '../../domain/usecases/sign_out_usecase.dart';
 import '../../domain/usecases/sign_up_usecase.dart';
 import '../../domain/usecases/watch_auth_state_usecase.dart';
+import '../../domain/usecases/reset_password_usecase.dart';
+import '../../domain/usecases/verify_otp_usecase.dart';
+import '../../domain/usecases/update_password_usecase.dart';
 
 final supabaseClientProvider = Provider<supabase.SupabaseClient>((ref) {
   return SupabaseService().client;
@@ -47,4 +50,19 @@ final getCurrentUserUseCaseProvider = Provider<GetCurrentUserUseCase>((ref) {
 final watchAuthStateUseCaseProvider = Provider<WatchAuthStateUseCase>((ref) {
   final repository = ref.watch(authRepositoryProvider);
   return WatchAuthStateUseCase(repository);
+});
+
+final resetPasswordUseCaseProvider = Provider<ResetPasswordUseCase>((ref) {
+  final repository = ref.watch(authRepositoryProvider);
+  return ResetPasswordUseCase(repository);
+});
+
+final verifyOtpUseCaseProvider = Provider<VerifyOtpUseCase>((ref) {
+  final repository = ref.watch(authRepositoryProvider);
+  return VerifyOtpUseCase(repository);
+});
+
+final updatePasswordUseCaseProvider = Provider<UpdatePasswordUseCase>((ref) {
+  final repository = ref.watch(authRepositoryProvider);
+  return UpdatePasswordUseCase(repository);
 });

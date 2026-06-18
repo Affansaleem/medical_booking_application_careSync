@@ -77,6 +77,48 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, void>> resetPassword({required String email}) async {
+    try {
+      await remoteDataSource.resetPassword(email: email);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> verifyOtp({
+    required String email,
+    required String token,
+    required supabase.OtpType type,
+  }) async {
+    try {
+      await remoteDataSource.verifyOtp(email: email, token: token, type: type);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updatePassword({
+    required String newPassword,
+  }) async {
+    try {
+      await remoteDataSource.updatePassword(newPassword: newPassword);
+      return const Right(null);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
   Stream<supabase.AuthState> get authStateChanges =>
       remoteDataSource.authStateChanges;
 }

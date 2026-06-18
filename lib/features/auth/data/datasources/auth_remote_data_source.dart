@@ -17,6 +17,16 @@ abstract class AuthRemoteDataSource {
 
   Future<UserModel?> getCurrentUser();
 
+  Future<void> resetPassword({required String email});
+
+  Future<void> verifyOtp({
+    required String email,
+    required String token,
+    required supabase.OtpType type,
+  });
+
+  Future<void> updatePassword({required String newPassword});
+
   Stream<supabase.AuthState> get authStateChanges;
 }
 
@@ -91,6 +101,49 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final user = _supabaseClient.auth.currentUser;
       if (user == null) return null;
       return UserModel.fromSupabase(user);
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<void> resetPassword({required String email}) async {
+    try {
+      await _supabaseClient.auth.resetPasswordForEmail(email);
+    } on supabase.AuthException catch (e) {
+      throw ServerException(message: e.message);
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<void> verifyOtp({
+    required String email,
+    required String token,
+    required supabase.OtpType type,
+  }) async {
+    try {
+      await _supabaseClient.auth.verifyOTP(
+        email: email,
+        token: token,
+        type: type,
+      );
+    } on supabase.AuthException catch (e) {
+      throw ServerException(message: e.message);
+    } catch (e) {
+      throw ServerException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<void> updatePassword({required String newPassword}) async {
+    try {
+      await _supabaseClient.auth.updateUser(
+        supabase.UserAttributes(password: newPassword),
+      );
+    } on supabase.AuthException catch (e) {
+      throw ServerException(message: e.message);
     } catch (e) {
       throw ServerException(message: e.toString());
     }

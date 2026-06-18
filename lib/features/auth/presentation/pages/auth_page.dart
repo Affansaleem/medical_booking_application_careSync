@@ -8,11 +8,10 @@ import '../../../../core/utils/app_toast.dart';
 import '../../../../core/utils/helpers.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/app_button.dart';
-import '../../../../core/widgets/app_asset.dart';
-import '../../../../gen/assets.gen.dart';
 import 'package:gap/gap.dart';
 import '../providers/auth_state_provider.dart';
 import '../../../../core/constants/app_shadows.dart';
+import '../../../../core/widgets/app_logo.dart';
 import '../widgets/role_selector.dart';
 
 class AuthPage extends ConsumerStatefulWidget {
@@ -139,35 +138,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Unified Logo & Header
-                    Center(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: [
-                              AppColors.primary,
-                              AppColors.secondary.withValues(alpha: 0.6),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          boxShadow: AppShadows.primary,
-                        ),
-                        padding: const EdgeInsets.all(3),
-                        child: Container(
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          padding: const EdgeInsets.all(16),
-                          child: AppAsset(
-                            path: Assets.logos.caresyncMain.path,
-                            height: 64,
-                            width: 64,
-                          ),
-                        ),
-                      ),
-                    ),
+                    const AppLogo(),
                     const Gap(20),
                     Text(
                       'CareSync',
@@ -259,6 +230,35 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                               onSubmitted: isLoginMode ? _submit : null,
                               validator: (value) => null,
                             ),
+
+                            // Forgot Password Link — Login Mode only
+                            AnimatedCrossFade(
+                              firstChild: const SizedBox.shrink(),
+                              secondChild: Align(
+                                alignment: Alignment.centerRight,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      context.push(AppRoutes.forgotPassword);
+                                    },
+                                    child: Text(
+                                      'Forgot Password?',
+                                      style: context.textTheme.bodyMedium
+                                          ?.copyWith(
+                                            color: primaryColor,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              crossFadeState: isLoginMode
+                                  ? CrossFadeState.showSecond
+                                  : CrossFadeState.showFirst,
+                              duration: const Duration(milliseconds: 200),
+                            ),
+
                             AnimatedCrossFade(
                               firstChild: const SizedBox.shrink(),
                               secondChild: Padding(
