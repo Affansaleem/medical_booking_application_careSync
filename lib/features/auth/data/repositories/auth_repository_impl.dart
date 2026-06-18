@@ -3,6 +3,7 @@ import '../../../../core/error/exceptions.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/utils/either.dart';
 import '../../domain/entities/user_entity.dart';
+import '../../domain/entities/user_role.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_remote_data_source.dart';
 
@@ -16,12 +17,14 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String password,
     required String name,
+    required UserRole role,
   }) async {
     try {
       final user = await remoteDataSource.signUp(
         email: email,
         password: password,
         name: name,
+        role: role,
       );
       return Right(user);
     } on ServerException catch (e) {

@@ -1,9 +1,11 @@
+import 'package:care_sync/core/extensions/context_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/utils/app_toast.dart';
+import '../../../../core/utils/helpers.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_asset.dart';
@@ -11,6 +13,7 @@ import '../../../../gen/assets.gen.dart';
 import 'package:gap/gap.dart';
 import '../providers/auth_state_provider.dart';
 import '../../../../core/constants/app_shadows.dart';
+import '../widgets/role_selector.dart';
 
 class AuthPage extends ConsumerStatefulWidget {
   const AuthPage({super.key});
@@ -22,24 +25,26 @@ class AuthPage extends ConsumerStatefulWidget {
 class _AuthPageState extends ConsumerState<AuthPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   final _nameController = TextEditingController();
-
-  bool _isLoginMode = true;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     _nameController.dispose();
     super.dispose();
   }
 
   void _submit() {
+    final isLoginMode = ref.read(authLoginModeProvider);
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
+    final confirmPassword = _confirmPasswordController.text.trim();
     final name = _nameController.text.trim();
 
-    if (!_isLoginMode && name.isEmpty) {
+    if (!isLoginMode && name.isEmpty) {
       AppToast.showError(context, 'Please enter your name');
       return;
     }
@@ -48,8 +53,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
       AppToast.showError(context, 'Please enter your email');
       return;
     }
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(email)) {
+    if (!AppHelpers.isValidEmail(email)) {
       AppToast.showError(context, 'Please enter a valid email address');
       return;
     }
@@ -66,18 +70,31 @@ class _AuthPageState extends ConsumerState<AuthPage> {
       return;
     }
 
+    if (!isLoginMode) {
+      if (confirmPassword.isEmpty) {
+        AppToast.showError(context, 'Please confirm your password');
+        return;
+      }
+      if (password != confirmPassword) {
+        AppToast.showError(context, 'Passwords do not match');
+        return;
+      }
+    }
+
     final authNotifier = ref.read(authNotifierProvider.notifier);
 
-    if (_isLoginMode) {
+    if (isLoginMode) {
       authNotifier.signIn(email, password);
     } else {
-      authNotifier.signUp(email, password, name);
+      final role = ref.read(authRoleProvider);
+      authNotifier.signUp(email, password, name, role);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
+    final isLoginMode = ref.watch(authLoginModeProvider);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -154,7 +171,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                     const Gap(20),
                     Text(
                       'CareSync',
-                      style: theme.textTheme.headlineMedium?.copyWith(
+                      style: context.textTheme.headlineMedium?.copyWith(
                         color: textPrimary,
                       ),
                       textAlign: TextAlign.center,
@@ -163,10 +180,10 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
-                        _isLoginMode
+                        isLoginMode
                             ? 'Welcome back! Log in to continue your healthcare journey.'
                             : 'Create your account to start managing appointments.',
-                        style: theme.textTheme.bodyMedium?.copyWith(
+                        style: context.textTheme.bodyMedium?.copyWith(
                           color: textSecondary,
                         ),
                         textAlign: TextAlign.center,
@@ -197,6 +214,20 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
+                            // Role selector — sign-up only
+                            AnimatedCrossFade(
+                              firstChild: const SizedBox.shrink(),
+                              secondChild: const Padding(
+                                padding: EdgeInsets.only(bottom: 20.0),
+                                child: RoleSelector(),
+                              ),
+                              crossFadeState: isLoginMode
+                                  ? CrossFadeState.showFirst
+                                  : CrossFadeState.showSecond,
+                              duration: const Duration(milliseconds: 200),
+                            ),
+
+                            // Name field — sign-up only
                             AnimatedCrossFade(
                               firstChild: const SizedBox.shrink(),
                               secondChild: Padding(
@@ -208,7 +239,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                   prefixIcon: Icons.person_outline_rounded,
                                 ),
                               ),
-                              crossFadeState: _isLoginMode
+                              crossFadeState: isLoginMode
                                   ? CrossFadeState.showFirst
                                   : CrossFadeState.showSecond,
                               duration: const Duration(milliseconds: 200),
@@ -222,14 +253,34 @@ class _AuthPageState extends ConsumerState<AuthPage> {
 
                             AppTextField.password(
                               controller: _passwordController,
-                              onSubmitted: _submit,
+                              textInputAction: isLoginMode
+                                  ? TextInputAction.done
+                                  : TextInputAction.next,
+                              onSubmitted: isLoginMode ? _submit : null,
                               validator: (value) => null,
+                            ),
+                            AnimatedCrossFade(
+                              firstChild: const SizedBox.shrink(),
+                              secondChild: Padding(
+                                padding: const EdgeInsets.only(top: 16.0),
+                                child: AppTextField.password(
+                                  controller: _confirmPasswordController,
+                                  labelText: 'Confirm Password',
+                                  textInputAction: TextInputAction.done,
+                                  onSubmitted: _submit,
+                                  validator: (value) => null,
+                                ),
+                              ),
+                              crossFadeState: isLoginMode
+                                  ? CrossFadeState.showFirst
+                                  : CrossFadeState.showSecond,
+                              duration: const Duration(milliseconds: 200),
                             ),
                             const Gap(24),
 
                             AppButton.primary(
                               onPressed: _submit,
-                              text: _isLoginMode ? 'Sign In' : 'Create Account',
+                              text: isLoginMode ? 'Sign In' : 'Create Account',
                               isLoading: authState is AuthLoading,
                             ),
                           ],
@@ -242,22 +293,21 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          _isLoginMode
+                          isLoginMode
                               ? "Don't have an account? "
                               : 'Already have an account? ',
-                          style: theme.textTheme.bodyMedium?.copyWith(
+                          style: context.textTheme.bodyMedium?.copyWith(
                             color: textSecondary,
                           ),
                         ),
                         GestureDetector(
                           onTap: () {
-                            setState(() {
-                              _isLoginMode = !_isLoginMode;
-                            });
+                            ref.read(authLoginModeProvider.notifier).state =
+                                !isLoginMode;
                           },
                           child: Text(
-                            _isLoginMode ? 'Sign Up' : 'Log In',
-                            style: theme.textTheme.bodyMedium?.copyWith(
+                            isLoginMode ? 'Sign Up' : 'Log In',
+                            style: context.textTheme.bodyMedium?.copyWith(
                               color: primaryColor,
                               fontWeight: FontWeight.bold,
                             ),

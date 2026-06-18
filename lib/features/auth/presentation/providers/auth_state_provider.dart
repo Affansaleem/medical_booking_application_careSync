@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/usecases/usecase.dart';
+import '../../domain/entities/user_role.dart';
 import '../../domain/usecases/get_current_user_usecase.dart';
 import '../../domain/usecases/sign_in_usecase.dart';
 import '../../domain/usecases/sign_out_usecase.dart';
@@ -7,6 +8,7 @@ import '../../domain/usecases/sign_up_usecase.dart';
 import 'auth_providers.dart';
 import 'auth_state.dart';
 export 'auth_state.dart';
+export '../../domain/entities/user_role.dart';
 
 class AuthNotifier extends StateNotifier<AuthState> {
   final SignInUseCase signInUseCase;
@@ -46,10 +48,15 @@ class AuthNotifier extends StateNotifier<AuthState> {
     );
   }
 
-  Future<void> signUp(String email, String password, String name) async {
+  Future<void> signUp(
+    String email,
+    String password,
+    String name,
+    UserRole role,
+  ) async {
     state = const AuthLoading();
     final result = await signUpUseCase(
-      SignUpParams(email: email, password: password, name: name),
+      SignUpParams(email: email, password: password, name: name, role: role),
     );
     result.fold(
       (failure) => state = AuthError(failure.message),
@@ -77,3 +84,7 @@ final authNotifierProvider = StateNotifierProvider<AuthNotifier, AuthState>((
     getCurrentUserUseCase: ref.watch(getCurrentUserUseCaseProvider),
   );
 });
+
+final authLoginModeProvider = StateProvider<bool>((ref) => true);
+
+final authRoleProvider = StateProvider<UserRole>((ref) => UserRole.patient);

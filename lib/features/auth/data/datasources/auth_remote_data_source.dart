@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import '../../../../core/error/exceptions.dart';
+import '../../../../features/auth/domain/entities/user_role.dart';
 import '../models/user_model.dart';
 
 abstract class AuthRemoteDataSource {
@@ -7,6 +8,7 @@ abstract class AuthRemoteDataSource {
     required String email,
     required String password,
     required String name,
+    required UserRole role,
   });
 
   Future<UserModel> signIn({required String email, required String password});
@@ -28,12 +30,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String email,
     required String password,
     required String name,
+    required UserRole role,
   }) async {
     try {
       final response = await _supabaseClient.auth.signUp(
         email: email,
         password: password,
-        data: {'name': name},
+        data: {'full_name': name, 'role': role.value},
       );
       if (response.user == null) {
         throw const supabase.AuthException(

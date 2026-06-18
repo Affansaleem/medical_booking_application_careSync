@@ -2,6 +2,7 @@ import '../../../../core/error/failures.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../../../../core/utils/either.dart';
 import '../entities/user_entity.dart';
+import '../entities/user_role.dart';
 import '../repositories/auth_repository.dart';
 
 class SignUpUseCase
@@ -16,6 +17,7 @@ class SignUpUseCase
       email: params.email,
       password: params.password,
       name: params.name,
+      role: params.role,
     );
   }
 }
@@ -24,10 +26,12 @@ class SignUpParams {
   final String email;
   final String password;
   final String name;
+  final UserRole role;
 
   const SignUpParams({
     required this.email,
     required this.password,
     required this.name,
+    required this.role,
   });
 }
