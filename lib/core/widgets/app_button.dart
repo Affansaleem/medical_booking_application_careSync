@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import '../constants/app_colors.dart';
 
-enum ButtonType { primary, secondary, outlined, text }
+enum ButtonType { primary, secondary, outlined, text, danger }
 
 class AppButton extends StatelessWidget {
   final VoidCallback? onPressed;
@@ -53,9 +53,20 @@ class AppButton extends StatelessWidget {
     this.height = 50,
   }) : type = ButtonType.text;
 
+  const AppButton.danger({
+    super.key,
+    required this.onPressed,
+    required this.text,
+    this.icon,
+    this.isLoading = false,
+    this.width = double.infinity,
+    this.height = 50,
+  }) : type = ButtonType.danger;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     Color backgroundColor;
     Color foregroundColor;
     BorderSide? borderSide;
@@ -71,12 +82,19 @@ class AppButton extends StatelessWidget {
         break;
       case ButtonType.outlined:
         backgroundColor = Colors.transparent;
-        foregroundColor = AppColors.primary;
-        borderSide = const BorderSide(color: AppColors.primary, width: 1.5);
+        foregroundColor = AppColors.textPrimaryLight;
+        borderSide = BorderSide(
+          color: isDark ? AppColors.borderDark : AppColors.borderLight,
+          width: 1.5,
+        );
         break;
       case ButtonType.text:
         backgroundColor = Colors.transparent;
         foregroundColor = AppColors.primary;
+        break;
+      case ButtonType.danger:
+        backgroundColor = AppColors.error;
+        foregroundColor = Colors.white;
         break;
     }
 
