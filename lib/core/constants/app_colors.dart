@@ -27,4 +27,10 @@ class AppColors {
   static const Color success = Color(0xFF10B981);
   static const Color warning = Color(0xFFF59E0B);
   static const Color error = Color(0xFFEF4444);
+
+  // Vivid toast notification colors
+  static const Color toastSuccess = Color(0xFF0EAB7C);
+  static const Color toastError = Color(0xFFE53535);
+  static const Color toastWarning = Color(0xFFE9920E);
+  static const Color toastInfo = Color(0xFF0A95D8);
 }

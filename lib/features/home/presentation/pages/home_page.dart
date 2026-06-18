@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_shadows.dart';
 import '../../../../core/constants/app_strings.dart';
 
 class HomePage extends StatefulWidget {
@@ -91,13 +92,7 @@ class _HomePageState extends State<HomePage> {
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.3),
-                      blurRadius: 15,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
+                  boxShadow: AppShadows.primary,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

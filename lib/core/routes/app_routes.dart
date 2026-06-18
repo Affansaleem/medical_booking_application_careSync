@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/auth/presentation/pages/auth_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 
 class AppRoutes {
@@ -11,7 +12,7 @@ class AppRoutes {
   static const String appointments = '/appointments';
 
   static final GoRouter router = GoRouter(
-    initialLocation: home,
+    initialLocation: login,
     debugLogDiagnostics: true,
     errorBuilder: (context, state) => Scaffold(
       body: Center(child: Text('No route defined for ${state.uri.path}')),
@@ -21,12 +22,9 @@ class AppRoutes {
         path: home,
         builder: (context, state) => const HomePage(title: 'CareSync Home'),
       ),
+      GoRoute(path: login, builder: (context, state) => const AuthPage()),
       /*
-      // Commented out until Auth, Doctors and Appointments features are implemented
-      GoRoute(
-        path: login,
-        builder: (context, state) => const LoginPage(),
-      ),
+      // Commented out until Doctors and Appointments features are implemented
       GoRoute(
         path: doctors,
         builder: (context, state) => const DoctorSearchPage(),
