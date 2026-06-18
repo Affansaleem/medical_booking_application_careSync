@@ -21,5 +21,15 @@ abstract class AuthRepository {
 
   Future<Either<Failure, UserEntity?>> getCurrentUser();
 
+  Future<Either<Failure, void>> resetPassword({required String email});
+
+  Future<Either<Failure, void>> verifyOtp({
+    required String email,
+    required String token,
+    required supabase.OtpType type,
+  });
+
+  Future<Either<Failure, void>> updatePassword({required String newPassword});
+
   Stream<supabase.AuthState> get authStateChanges;
 }

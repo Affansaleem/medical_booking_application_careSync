@@ -25,3 +25,15 @@ class AuthError extends AuthState {
   final String message;
   const AuthError(this.message);
 }
+
+class AuthPasswordResetSent extends AuthState {
+  const AuthPasswordResetSent();
+}
+
+class AuthOtpVerified extends AuthState {
+  const AuthOtpVerified();
+}
+
+class AuthPasswordResetSuccess extends AuthState {
+  const AuthPasswordResetSuccess();
+}

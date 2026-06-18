@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/pages/auth_page.dart';
+import '../../features/auth/presentation/pages/forgot_password_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 
 class AppRoutes {
@@ -8,6 +9,7 @@ class AppRoutes {
 
   static const String home = '/';
   static const String login = '/login';
+  static const String forgotPassword = '/forgot-password';
   static const String doctors = '/doctors';
   static const String appointments = '/appointments';
 
@@ -23,6 +25,10 @@ class AppRoutes {
         builder: (context, state) => const HomePage(title: 'CareSync Home'),
       ),
       GoRoute(path: login, builder: (context, state) => const AuthPage()),
+      GoRoute(
+        path: forgotPassword,
+        builder: (context, state) => const ForgotPasswordPage(),
+      ),
       /*
       // Commented out until Doctors and Appointments features are implemented
       GoRoute(
