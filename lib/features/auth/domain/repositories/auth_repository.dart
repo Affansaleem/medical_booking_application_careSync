@@ -31,5 +31,9 @@ abstract class AuthRepository {
 
   Future<Either<Failure, void>> updatePassword({required String newPassword});
 
+  Future<Either<Failure, UserEntity>> completeOnboarding({
+    required Map<String, dynamic> onboardingData,
+  });
+
   Stream<supabase.AuthState> get authStateChanges;
 }

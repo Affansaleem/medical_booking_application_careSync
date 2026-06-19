@@ -9,6 +9,7 @@ import '../../domain/usecases/sign_up_usecase.dart';
 import '../../domain/usecases/reset_password_usecase.dart';
 import '../../domain/usecases/verify_otp_usecase.dart';
 import '../../domain/usecases/update_password_usecase.dart';
+import '../../domain/usecases/complete_onboarding_usecase.dart';
 import 'auth_providers.dart';
 import 'auth_state.dart';
 export 'auth_state.dart';
@@ -22,6 +23,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final ResetPasswordUseCase resetPasswordUseCase;
   final VerifyOtpUseCase verifyOtpUseCase;
   final UpdatePasswordUseCase updatePasswordUseCase;
+  final CompleteOnboardingUseCase completeOnboardingUseCase;
 
   AuthNotifier({
     required this.signInUseCase,
@@ -31,14 +33,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required this.resetPasswordUseCase,
     required this.verifyOtpUseCase,
     required this.updatePasswordUseCase,
-  }) : super(const AuthInitial()) {
-    checkCurrentUser();
-  }
+    required this.completeOnboardingUseCase,
+  }) : super(const AuthInitial());
 
   Future<void> checkCurrentUser() async {
     state = const AuthLoading();
     final result = await getCurrentUserUseCase(const NoParams());
-    result.fold((failure) => state = AuthError(failure.message), (user) {
+    result.fold((failure) => state = AuthError(failure.message, state), (user) {
       if (user != null) {
         state = AuthAuthenticated(user);
       } else {
@@ -48,12 +49,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> signIn(String email, String password) async {
-    state = const AuthLoading();
+    state = AuthLoading(state);
     final result = await signInUseCase(
       SignInParams(email: email, password: password),
     );
     result.fold(
-      (failure) => state = AuthError(failure.message),
+      (failure) => state = AuthError(failure.message, state),
       (user) => state = AuthAuthenticated(user),
     );
   }
@@ -64,36 +65,36 @@ class AuthNotifier extends StateNotifier<AuthState> {
     String name,
     UserRole role,
   ) async {
-    state = const AuthLoading();
+    state = AuthLoading(state);
     final result = await signUpUseCase(
       SignUpParams(email: email, password: password, name: name, role: role),
     );
     result.fold(
-      (failure) => state = AuthError(failure.message),
+      (failure) => state = AuthError(failure.message, state),
       (user) => state = AuthAuthenticated(user),
     );
   }
 
   Future<void> signOut() async {
-    state = const AuthLoading();
+    state = AuthLoading(state);
     final result = await signOutUseCase(const NoParams());
     result.fold(
-      (failure) => state = AuthError(failure.message),
+      (failure) => state = AuthError(failure.message, state),
       (_) => state = const AuthUnauthenticated(),
     );
   }
 
   Future<void> sendPasswordReset(String email) async {
-    state = const AuthLoading();
+    state = AuthLoading(state);
     final result = await resetPasswordUseCase(email);
     result.fold(
-      (failure) => state = AuthError(failure.message),
+      (failure) => state = AuthError(failure.message, state),
       (_) => state = const AuthPasswordResetSent(),
     );
   }
 
   Future<void> verifyOtp(String email, String token) async {
-    state = const AuthLoading();
+    state = AuthLoading(state);
     final result = await verifyOtpUseCase(
       VerifyOtpParams(
         email: email,
@@ -102,17 +103,26 @@ class AuthNotifier extends StateNotifier<AuthState> {
       ),
     );
     result.fold(
-      (failure) => state = AuthError(failure.message),
+      (failure) => state = AuthError(failure.message, state),
       (_) => state = const AuthOtpVerified(),
     );
   }
 
   Future<void> updatePassword(String newPassword) async {
-    state = const AuthLoading();
+    state = AuthLoading(state);
     final result = await updatePasswordUseCase(newPassword);
     result.fold(
-      (failure) => state = AuthError(failure.message),
+      (failure) => state = AuthError(failure.message, state),
       (_) => state = const AuthPasswordResetSuccess(),
+    );
+  }
+
+  Future<void> completeOnboarding(Map<String, dynamic> onboardingData) async {
+    state = AuthLoading(state);
+    final result = await completeOnboardingUseCase(onboardingData);
+    result.fold(
+      (failure) => state = AuthError(failure.message, state),
+      (user) => state = AuthAuthenticated(user),
     );
   }
 }
@@ -128,6 +138,7 @@ final authNotifierProvider = StateNotifierProvider<AuthNotifier, AuthState>((
     resetPasswordUseCase: ref.watch(resetPasswordUseCaseProvider),
     verifyOtpUseCase: ref.watch(verifyOtpUseCaseProvider),
     updatePasswordUseCase: ref.watch(updatePasswordUseCaseProvider),
+    completeOnboardingUseCase: ref.watch(completeOnboardingUseCaseProvider),
   );
 });
 

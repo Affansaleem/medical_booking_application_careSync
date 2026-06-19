@@ -9,7 +9,8 @@ class AuthInitial extends AuthState {
 }
 
 class AuthLoading extends AuthState {
-  const AuthLoading();
+  final AuthState? previousState;
+  const AuthLoading([this.previousState]);
 }
 
 class AuthAuthenticated extends AuthState {
@@ -23,7 +24,8 @@ class AuthUnauthenticated extends AuthState {
 
 class AuthError extends AuthState {
   final String message;
-  const AuthError(this.message);
+  final AuthState? previousState;
+  const AuthError(this.message, [this.previousState]);
 }
 
 class AuthPasswordResetSent extends AuthState {

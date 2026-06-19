@@ -1,6 +1,6 @@
 {
-    "name": "care_sync",
-    "short_name": "care_sync",
+    "name": "CareSync",
+    "short_name": "CareSync",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

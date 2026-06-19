@@ -44,38 +44,35 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     final name = _nameController.text.trim();
 
     if (!isLoginMode && name.isEmpty) {
-      AppToast.showError(context, 'Please enter your name');
+      AppToast.showError('Please enter your name');
       return;
     }
 
     if (email.isEmpty) {
-      AppToast.showError(context, 'Please enter your email');
+      AppToast.showError('Please enter your email');
       return;
     }
     if (!AppHelpers.isValidEmail(email)) {
-      AppToast.showError(context, 'Please enter a valid email address');
+      AppToast.showError('Please enter a valid email address');
       return;
     }
 
     if (password.isEmpty) {
-      AppToast.showError(context, 'Please enter your password');
+      AppToast.showError('Please enter your password');
       return;
     }
     if (password.length < 6) {
-      AppToast.showError(
-        context,
-        'Password must be at least 6 characters long',
-      );
+      AppToast.showError('Password must be at least 6 characters long');
       return;
     }
 
     if (!isLoginMode) {
       if (confirmPassword.isEmpty) {
-        AppToast.showError(context, 'Please confirm your password');
+        AppToast.showError('Please confirm your password');
         return;
       }
       if (password != confirmPassword) {
-        AppToast.showError(context, 'Passwords do not match');
+        AppToast.showError('Passwords do not match');
         return;
       }
     }
@@ -99,10 +96,9 @@ class _AuthPageState extends ConsumerState<AuthPage> {
 
     ref.listen<AuthState>(authNotifierProvider, (previous, next) {
       if (next is AuthAuthenticated) {
-        AppToast.showSuccess(context, 'Signed in successfully!');
-        context.go(AppRoutes.home);
+        AppToast.showSuccess('Signed in successfully!');
       } else if (next is AuthError) {
-        AppToast.showError(context, next.message);
+        AppToast.showError(next.message);
       }
     });
 
@@ -309,7 +305,6 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                             isLoginMode ? 'Sign Up' : 'Log In',
                             style: context.textTheme.bodyMedium?.copyWith(
                               color: primaryColor,
-                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
