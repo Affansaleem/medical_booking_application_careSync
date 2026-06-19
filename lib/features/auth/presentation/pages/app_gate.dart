@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/services/toast_service.dart';
 import '../../../../core/widgets/splash_screen.dart';
-import '../../../home/presentation/pages/home_page.dart';
+import '../../../home/presentation/pages/doctor_main_page.dart';
+import '../../../home/presentation/pages/patient_main_page.dart';
 import '../providers/auth_state_provider.dart';
 import 'auth_page.dart';
 import 'onboarding_page.dart';
@@ -59,7 +60,11 @@ class AppGate extends ConsumerWidget {
       if (!activeState.user.isOnboardingCompleted) {
         return const OnboardingPage();
       }
-      return const HomePage(title: 'CareSync Home');
+      if (activeState.user.role == UserRole.doctor) {
+        return const DoctorMainPage();
+      } else {
+        return const PatientMainPage();
+      }
     }
 
     return const AuthPage();
