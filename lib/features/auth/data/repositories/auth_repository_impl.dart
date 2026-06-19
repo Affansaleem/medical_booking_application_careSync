@@ -119,6 +119,22 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, UserEntity>> completeOnboarding({
+    required Map<String, dynamic> onboardingData,
+  }) async {
+    try {
+      final user = await remoteDataSource.completeOnboarding(
+        onboardingData: onboardingData,
+      );
+      return Right(user);
+    } on ServerException catch (e) {
+      return Left(AuthFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
   Stream<supabase.AuthState> get authStateChanges =>
       remoteDataSource.authStateChanges;
 }

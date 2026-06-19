@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_shadows.dart';
 import '../../../../core/constants/app_strings.dart';
-import '../../../../core/routes/app_routes.dart';
-import '../../../../core/utils/app_toast.dart';
 import '../../../auth/presentation/providers/auth_state_provider.dart';
 import '../../../../core/widgets/app_confirmation_dialog.dart';
 
@@ -31,15 +28,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-
-    ref.listen<AuthState>(authNotifierProvider, (previous, next) {
-      if (next is AuthUnauthenticated) {
-        context.go(AppRoutes.login);
-      } else if (next is AuthError) {
-        AppToast.showError(context, next.message);
-      }
-    });
-
     return Scaffold(
       backgroundColor: isDark
           ? AppColors.backgroundDark

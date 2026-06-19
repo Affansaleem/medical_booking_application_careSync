@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
+import '../navigation/app_navigator_key.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_shadows.dart';
 
@@ -10,13 +10,15 @@ class AppToast {
 
   static OverlayEntry? _currentEntry;
 
-  static void show(
-    BuildContext context, {
+  static void show({
     required String message,
     required ToastType type,
     String? title,
     Duration duration = const Duration(seconds: 3),
   }) {
+    final overlay = appNavigatorKey.currentState?.overlay;
+    if (overlay == null) return;
+
     Color backgroundColor;
     Color glowColor;
     const contentColor = Colors.white;
@@ -50,7 +52,6 @@ class AppToast {
         break;
     }
 
-    // Dismiss any existing toast before showing the new one
     _currentEntry?.remove();
     _currentEntry = null;
 
@@ -72,32 +73,20 @@ class AppToast {
     );
 
     _currentEntry = entry;
-    Overlay.of(context).insert(entry);
+    overlay.insert(entry);
   }
 
-  static void showSuccess(
-    BuildContext context,
-    String message, {
-    String? title,
-  }) {
-    show(context, message: message, type: ToastType.success, title: title);
-  }
+  static void showSuccess(String message, {String? title}) =>
+      show(message: message, type: ToastType.success, title: title);
 
-  static void showError(BuildContext context, String message, {String? title}) {
-    show(context, message: message, type: ToastType.error, title: title);
-  }
+  static void showError(String message, {String? title}) =>
+      show(message: message, type: ToastType.error, title: title);
 
-  static void showWarning(
-    BuildContext context,
-    String message, {
-    String? title,
-  }) {
-    show(context, message: message, type: ToastType.warning, title: title);
-  }
+  static void showWarning(String message, {String? title}) =>
+      show(message: message, type: ToastType.warning, title: title);
 
-  static void showInfo(BuildContext context, String message, {String? title}) {
-    show(context, message: message, type: ToastType.info, title: title);
-  }
+  static void showInfo(String message, {String? title}) =>
+      show(message: message, type: ToastType.info, title: title);
 }
 
 // ---------------------------------------------------------------------------
@@ -157,7 +146,6 @@ class _ToastOverlayState extends State<_ToastOverlay>
 
     _controller.forward();
 
-    // Auto-dismiss after duration
     Future.delayed(widget.duration, _dismiss);
   }
 
@@ -197,20 +185,18 @@ class _ToastOverlayState extends State<_ToastOverlay>
                     color: widget.backgroundColor,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
-                      // Colored glow
                       BoxShadow(
                         color: widget.glowColor.withValues(alpha: 0.45),
                         blurRadius: 20,
                         offset: const Offset(0, 6),
                       ),
-                      // Base shadow
                       ...AppShadows.toast,
                     ],
                   ),
                   child: Row(
                     children: [
                       Icon(widget.icon, color: widget.contentColor, size: 24),
-                      const Gap(12),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -224,7 +210,7 @@ class _ToastOverlayState extends State<_ToastOverlay>
                                     fontWeight: FontWeight.bold,
                                   ),
                             ),
-                            const Gap(2),
+                            const SizedBox(height: 2),
                             Text(
                               widget.message,
                               style: Theme.of(context).textTheme.bodySmall
@@ -237,7 +223,7 @@ class _ToastOverlayState extends State<_ToastOverlay>
                           ],
                         ),
                       ),
-                      const Gap(8),
+                      const SizedBox(width: 8),
                       GestureDetector(
                         onTap: _dismiss,
                         child: Icon(

@@ -12,6 +12,7 @@ import '../../domain/usecases/watch_auth_state_usecase.dart';
 import '../../domain/usecases/reset_password_usecase.dart';
 import '../../domain/usecases/verify_otp_usecase.dart';
 import '../../domain/usecases/update_password_usecase.dart';
+import '../../domain/usecases/complete_onboarding_usecase.dart';
 
 final supabaseClientProvider = Provider<supabase.SupabaseClient>((ref) {
   return SupabaseService().client;
@@ -65,4 +66,11 @@ final verifyOtpUseCaseProvider = Provider<VerifyOtpUseCase>((ref) {
 final updatePasswordUseCaseProvider = Provider<UpdatePasswordUseCase>((ref) {
   final repository = ref.watch(authRepositoryProvider);
   return UpdatePasswordUseCase(repository);
+});
+
+final completeOnboardingUseCaseProvider = Provider<CompleteOnboardingUseCase>((
+  ref,
+) {
+  final repository = ref.watch(authRepositoryProvider);
+  return CompleteOnboardingUseCase(repository);
 });

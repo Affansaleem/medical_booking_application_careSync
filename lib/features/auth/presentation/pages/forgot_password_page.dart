@@ -43,11 +43,11 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
     final email = _emailController.text.trim();
 
     if (email.isEmpty) {
-      AppToast.showError(context, 'Please enter your email');
+      AppToast.showError('Please enter your email');
       return;
     }
     if (!AppHelpers.isValidEmail(email)) {
-      AppToast.showError(context, 'Please enter a valid email address');
+      AppToast.showError('Please enter a valid email address');
       return;
     }
 
@@ -61,28 +61,25 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
     final confirmPassword = _confirmPasswordController.text.trim();
 
     if (otp.isEmpty) {
-      AppToast.showError(context, 'Please enter the verification code');
+      AppToast.showError('Please enter the verification code');
       return;
     }
 
     if (password.isEmpty) {
-      AppToast.showError(context, 'Please enter a new password');
+      AppToast.showError('Please enter a new password');
       return;
     }
     if (password.length < 6) {
-      AppToast.showError(
-        context,
-        'Password must be at least 6 characters long',
-      );
+      AppToast.showError('Password must be at least 6 characters long');
       return;
     }
 
     if (confirmPassword.isEmpty) {
-      AppToast.showError(context, 'Please confirm your new password');
+      AppToast.showError('Please confirm your new password');
       return;
     }
     if (password != confirmPassword) {
-      AppToast.showError(context, 'Passwords do not match');
+      AppToast.showError('Passwords do not match');
       return;
     }
 
@@ -98,7 +95,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
 
     ref.listen<AuthState>(authNotifierProvider, (previous, next) {
       if (next is AuthPasswordResetSent) {
-        AppToast.showSuccess(context, 'Verification code sent to your email!');
+        AppToast.showSuccess('Verification code sent to your email!');
         setState(() {
           _isOtpSent = true;
         });
@@ -109,12 +106,11 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
             .updatePassword(_pendingPassword);
       } else if (next is AuthPasswordResetSuccess) {
         AppToast.showSuccess(
-          context,
           'Password reset successfully! Log in with your new password.',
         );
-        context.go(AppRoutes.login);
+        context.go(AppRoutes.home);
       } else if (next is AuthError) {
-        AppToast.showError(context, next.message);
+        AppToast.showError(next.message);
       }
     });
 
@@ -276,7 +272,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            context.go(AppRoutes.login);
+                            context.go(AppRoutes.home);
                           },
                           child: Text(
                             'Log In',
