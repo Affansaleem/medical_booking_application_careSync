@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../features/auth/domain/entities/user_entity.dart';
+
 enum DoctorAppointmentStatus { confirmed, pending, completed }
 
 extension DoctorAppointmentStatusX on DoctorAppointmentStatus {
@@ -63,6 +64,8 @@ class DoctorAppointmentItem {
     required this.notes,
     this.avatarUrl,
     this.isVideo = false,
+    this.appointmentDate,
+    this.type = 'Consultation',
   });
 
   final String id;
@@ -73,6 +76,22 @@ class DoctorAppointmentItem {
   final String notes;
   final String? avatarUrl;
   final bool isVideo;
+  final DateTime? appointmentDate;
+  final String type;
+
+  static List<DoctorAppointmentItem> get dummyAppointments => List.generate(
+    3,
+    (index) => DoctorAppointmentItem(
+      id: 'APT-000$index',
+      patientName: 'John Doe',
+      initials: 'JD',
+      timeSlot: '09:00 AM - 09:30 AM',
+      status: DoctorAppointmentStatus.pending,
+      notes: 'This is a sample patient note for skeleton loading skeletonizer.',
+      isVideo: index % 2 == 0,
+      appointmentDate: DateTime.now(),
+    ),
+  );
 }
 
 class DoctorHomeTabData {
@@ -196,15 +215,19 @@ class DoctorHomeTabData {
       ),
       DoctorDashboardMetric(
         title: 'Pending Requests',
-        value:
-            appointments.where((item) => item.status == DoctorAppointmentStatus.pending).length.toString(),
+        value: appointments
+            .where((item) => item.status == DoctorAppointmentStatus.pending)
+            .length
+            .toString(),
         icon: Icons.pending_actions_rounded,
         color: AppColors.warning,
       ),
       DoctorDashboardMetric(
         title: 'Completed Today',
-        value:
-            appointments.where((item) => item.status == DoctorAppointmentStatus.completed).length.toString(),
+        value: appointments
+            .where((item) => item.status == DoctorAppointmentStatus.completed)
+            .length
+            .toString(),
         icon: Icons.check_circle_outline_rounded,
         color: AppColors.success,
       ),
@@ -232,8 +255,7 @@ class DoctorHomeTabData {
       avatarUrl: avatarUrl,
       isPendingVerification: isPendingVerification,
       metrics: metrics,
-      nextAppointment:
-          nextAppointment.id.isEmpty ? null : nextAppointment,
+      nextAppointment: nextAppointment.id.isEmpty ? null : nextAppointment,
       schedule: confirmedAppointments,
       scheduleDateLabel: _formatTodayLabel(DateTime.now()),
     );
@@ -241,12 +263,16 @@ class DoctorHomeTabData {
 }
 
 String _normalizeDoctorName(String? name) {
-  final resolved = (name == null || name.trim().isEmpty) ? 'Doctor' : name.trim();
+  final resolved = (name == null || name.trim().isEmpty)
+      ? 'Doctor'
+      : name.trim();
   return resolved.startsWith('Dr.') ? resolved : 'Dr. $resolved';
 }
 
-String _formatTodayLabel(DateTime date) {
-  const months = [
+class DoctorScheduleConfig {
+  DoctorScheduleConfig._();
+
+  static const List<String> monthNames = [
     'January',
     'February',
     'March',
@@ -260,5 +286,77 @@ String _formatTodayLabel(DateTime date) {
     'November',
     'December',
   ];
-  return '${months[date.month - 1]} ${date.day}, ${date.year}';
+
+  static const List<Map<String, dynamic>> mockAppointments = [
+    {
+      'id': 'APT-9821',
+      'patientName': 'Sarah Connor',
+      'initials': 'SC',
+      'time': '09:00 AM - 09:30 AM',
+      'type': 'Follow-up',
+      'method': 'Video Call',
+      'isOnline': true,
+      'status': 'confirmed',
+      'dateOffset': 0,
+    },
+    {
+      'id': 'APT-4412',
+      'patientName': 'David Miller',
+      'initials': 'DM',
+      'time': '10:15 AM - 10:45 AM',
+      'type': 'First Consultation',
+      'method': 'In-Person',
+      'isOnline': false,
+      'status': 'pending',
+      'dateOffset': 0,
+    },
+    {
+      'id': 'APT-8711',
+      'patientName': 'Emma Watson',
+      'initials': 'EW',
+      'time': '02:00 PM - 02:30 PM',
+      'type': 'General Checkup',
+      'method': 'Video Call',
+      'isOnline': true,
+      'status': 'confirmed',
+      'dateOffset': 0,
+    },
+    {
+      'id': 'APT-1090',
+      'patientName': 'James Cameron',
+      'initials': 'JC',
+      'time': '11:00 AM - 11:30 AM',
+      'type': 'Consultation',
+      'method': 'Video Call',
+      'isOnline': true,
+      'status': 'pending',
+      'dateOffset': 1,
+    },
+    {
+      'id': 'APT-3291',
+      'patientName': 'Olivia Wilde',
+      'initials': 'OW',
+      'time': '03:30 PM - 04:00 PM',
+      'type': 'Report Review',
+      'method': 'In-Person',
+      'isOnline': false,
+      'status': 'confirmed',
+      'dateOffset': 1,
+    },
+    {
+      'id': 'APT-5561',
+      'patientName': 'Bruce Wayne',
+      'initials': 'BW',
+      'time': '10:00 AM - 10:30 AM',
+      'type': 'Physical Therapy',
+      'method': 'In-Person',
+      'isOnline': false,
+      'status': 'confirmed',
+      'dateOffset': 2,
+    },
+  ];
+}
+
+String _formatTodayLabel(DateTime date) {
+  return '${DoctorScheduleConfig.monthNames[date.month - 1]} ${date.day}, ${date.year}';
 }

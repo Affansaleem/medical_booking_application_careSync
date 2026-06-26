@@ -21,6 +21,8 @@ class GetDoctorAppointmentsUseCase
     return repository.getDoctorAppointments(
       doctorId: params.doctorId,
       date: params.date,
+      status: params.status,
+      appointmentType: params.appointmentType,
     );
   }
 }
@@ -28,6 +30,13 @@ class GetDoctorAppointmentsUseCase
 class GetDoctorAppointmentsParams {
   final String doctorId;
   final String? date;
+  final String? status;
+  final String? appointmentType;
 
-  const GetDoctorAppointmentsParams({required this.doctorId, this.date});
+  const GetDoctorAppointmentsParams({
+    required this.doctorId,
+    this.date,
+    this.status,
+    this.appointmentType,
+  });
 }

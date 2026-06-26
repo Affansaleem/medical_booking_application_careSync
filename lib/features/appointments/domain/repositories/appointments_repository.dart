@@ -6,5 +6,12 @@ abstract class AppointmentsRepository {
   Future<Either<Failure, List<AppointmentEntity>>> getDoctorAppointments({
     required String doctorId,
     String? date,
+    String? status,
+    String? appointmentType,
+  });
+
+  Future<Either<Failure, void>> updateAppointmentStatus({
+    required String appointmentId,
+    required String status,
   });
 }

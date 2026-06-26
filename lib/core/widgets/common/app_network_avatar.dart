@@ -1,4 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'app_shimmer_box.dart';
 import '../../constants/app_colors.dart';
 
 class AppNetworkAvatar extends StatelessWidget {
@@ -29,30 +32,76 @@ class AppNetworkAvatar extends StatelessWidget {
     final resolvedBorderColor =
         borderColor ?? (isDark ? AppColors.borderDark : AppColors.borderLight);
 
+    final defaultTextStyle = theme.textTheme.titleSmall?.copyWith(
+      color: isDark
+          ? AppColors.textSecondaryDark
+          : AppColors.textSecondaryLight,
+      fontWeight: FontWeight.w700,
+    );
+
+    final hasImage = imageUrl != null && imageUrl!.trim().isNotEmpty;
+    Widget? imageWidget;
+
+    if (hasImage) {
+      final path = imageUrl!.trim();
+      if (path.startsWith('http://') || path.startsWith('https://')) {
+        imageWidget = CachedNetworkImage(
+          imageUrl: path,
+          fit: BoxFit.cover,
+          placeholder: (context, url) => AppShimmerBox(
+            width: radius * 2,
+            height: radius * 2,
+            borderRadius: radius,
+          ),
+          errorWidget: (context, url, error) => Center(
+            child: Text(
+              _resolveInitials(name),
+              style: textStyle ?? defaultTextStyle,
+            ),
+          ),
+        );
+      } else if (path.startsWith('assets/')) {
+        imageWidget = Image.asset(
+          path,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => Center(
+            child: Text(
+              _resolveInitials(name),
+              style: textStyle ?? defaultTextStyle,
+            ),
+          ),
+        );
+      } else {
+        imageWidget = Image.file(
+          File(path),
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => Center(
+            child: Text(
+              _resolveInitials(name),
+              style: textStyle ?? defaultTextStyle,
+            ),
+          ),
+        );
+      }
+    }
+
     return Container(
+      width: radius * 2,
+      height: radius * 2,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(color: resolvedBorderColor, width: 2),
+        color: resolvedBackground,
       ),
-      child: CircleAvatar(
-        radius: radius,
-        backgroundColor: resolvedBackground,
-        backgroundImage: imageUrl != null && imageUrl!.isNotEmpty
-            ? NetworkImage(imageUrl!)
-            : null,
-        child: imageUrl == null || imageUrl!.isEmpty
-            ? Text(
-                _resolveInitials(name),
-                style:
-                    textStyle ??
-                    theme.textTheme.titleSmall?.copyWith(
-                      color: isDark
-                          ? AppColors.textSecondaryDark
-                          : AppColors.textSecondaryLight,
-                      fontWeight: FontWeight.w700,
-                    ),
-              )
-            : null,
+      child: ClipOval(
+        child: hasImage
+            ? imageWidget
+            : Center(
+                child: Text(
+                  _resolveInitials(name),
+                  style: textStyle ?? defaultTextStyle,
+                ),
+              ),
       ),
     );
   }

@@ -80,6 +80,7 @@ class DoctorHomeController
               isVideo:
                   entity.appointmentType.toLowerCase() == 'video' ||
                   entity.appointmentType.toLowerCase() == 'telehealth',
+              appointmentDate: entity.appointmentDate,
             );
           }).toList();
 
