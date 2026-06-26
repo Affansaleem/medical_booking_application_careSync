@@ -14,13 +14,35 @@ class AppointmentsRepositoryImpl implements AppointmentsRepository {
   Future<Either<Failure, List<AppointmentEntity>>> getDoctorAppointments({
     required String doctorId,
     String? date,
+    String? status,
+    String? appointmentType,
   }) async {
     try {
       final appointments = await remoteDataSource.getDoctorAppointments(
         doctorId: doctorId,
         date: date,
+        status: status,
+        appointmentType: appointmentType,
       );
       return Right(appointments);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message, statusCode: e.statusCode));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateAppointmentStatus({
+    required String appointmentId,
+    required String status,
+  }) async {
+    try {
+      await remoteDataSource.updateAppointmentStatus(
+        appointmentId: appointmentId,
+        status: status,
+      );
+      return const Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message, statusCode: e.statusCode));
     } catch (e) {

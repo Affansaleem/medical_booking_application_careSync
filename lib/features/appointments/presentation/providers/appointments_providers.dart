@@ -4,6 +4,7 @@ import '../../data/datasources/appointments_remote_data_source.dart';
 import '../../data/repositories/appointments_repository_impl.dart';
 import '../../domain/repositories/appointments_repository.dart';
 import '../../domain/usecases/get_doctor_appointments_usecase.dart';
+import '../../domain/usecases/update_appointment_status_usecase.dart';
 
 final appointmentsRemoteDataSourceProvider =
     Provider<AppointmentsRemoteDataSource>((ref) {
@@ -20,4 +21,10 @@ final getDoctorAppointmentsUseCaseProvider =
     Provider<GetDoctorAppointmentsUseCase>((ref) {
       final repository = ref.watch(appointmentsRepositoryProvider);
       return GetDoctorAppointmentsUseCase(repository);
+    });
+
+final updateAppointmentStatusUseCaseProvider =
+    Provider<UpdateAppointmentStatusUseCase>((ref) {
+      final repository = ref.watch(appointmentsRepositoryProvider);
+      return UpdateAppointmentStatusUseCase(repository);
     });
